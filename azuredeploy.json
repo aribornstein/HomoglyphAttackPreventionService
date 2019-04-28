@@ -1,0 +1,115 @@
+{
+    "$schema": "http://schema.management.azure.com/schemas/2014-04-01-preview/deploymentTemplate.json#",
+    "contentVersion": "1.0.0.0",
+    "parameters": {
+        "appName": {
+            "defaultValue": "homoglyph-service",
+            "type": "String"
+        },
+        "accountName": {
+            "defaultValue": "computervisionapi",
+            "type": "String",
+            "metadata": {
+                "description": "Display name of Computer Vision API account"
+            }
+        },
+        "SKU": {
+            "defaultValue": "F0",
+            "allowedValues": [
+                "F0",
+                "S1"
+            ],
+            "type": "String",
+            "metadata": {
+                "description": "SKU for Computer Vision API"
+            }
+        },
+        "cognitiveServicesLocation": {
+            "defaultValue": "westeurope",
+            "allowedValues": [
+                "westeurope",
+                "eastus2",
+                "southeastasia",
+                "centralus",
+                "westus"
+            ],
+            "minLength": 1,
+            "type": "String",
+            "metadata": {
+                "description": "The location for the Computer Vision API"
+            }
+        }
+    },
+    "variables": {
+        "cognitiveservicesid": "[concat(resourceGroup().id,'/providers/','Microsoft.CognitiveServices/accounts/', parameters('accountName'))]",
+        "servicePlanName": "[concat('serviceplan',uniqueString(resourceGroup().id))]"
+    },
+    "resources": [
+        {
+            "type": "Microsoft.CognitiveServices/accounts",
+            "apiVersion": "2016-02-01-preview",
+            "name": "[parameters('accountName')]",
+            "location": "[parameters('cognitiveServicesLocation')]",
+            "sku": {
+                "name": "[parameters('SKU')]"
+            },
+            "kind": "ComputerVision"
+        },
+        {
+            "type": "Microsoft.Web/serverfarms",
+            "apiVersion": "2016-03-01",
+            "name": "[variables('servicePlanName')]",
+            "location": "[resourceGroup().location]",
+            "sku": {
+                "name": "B1",
+                "capacity": 1
+            },
+            "kind": "linux",
+            "properties": {
+                "workerSizeId": 0,
+                "reserved": true,
+                "hostingEnvironment": ""
+            }
+        },
+        {
+            "type": "Microsoft.Web/sites",
+            "apiVersion": "2016-03-01",
+            "name": "[parameters('appName')]",
+            "location": "[resourceGroup().location]",
+            "dependsOn": [
+                "[resourceId('Microsoft.Web/serverfarms', variables('servicePlanName'))]",
+                "[resourceId('Microsoft.CognitiveServices/accounts', parameters('accountName'))]"
+
+            ],
+            "properties": {
+                "name": "[parameters('appName')]",
+                "siteConfig": {
+                    "appSettings": [
+                        {
+                            "name": "WEBSITES_ENABLE_APP_SERVICE_STORAGE",
+                            "value": "false"
+                        },
+                        {
+                            "name":"WEBSITES_PORT",
+                            "value": 5000
+                        },
+                        {
+                            "name": "key",
+                            "value": "[listKeys(variables('cognitiveservicesid'),'2016-02-01-preview').key1]"   
+                        },
+                        {
+                            "name": "region",
+                            "value": "[parameters('cognitiveServicesLocation')]"
+                        }
+
+                    ],
+                    "appCommandLine": "",
+                    "linuxFxVersion": "DOCKER|abornst/homoglyph_service"
+                },
+                "clientAffinityEnabled": false,
+                "serverFarmId": "[resourceId('Microsoft.Web/serverfarms', variables('servicePlanName'))]",
+                "hostingEnvironment": ""
+            }
+        }
+    ]
+}
