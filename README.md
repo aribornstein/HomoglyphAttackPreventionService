@@ -11,6 +11,8 @@ To use the service just send a URL encoded query string of up to 200 characters 
 <img src="https://raw.githubusercontent.com/Azure/azure-quickstart-templates/master/1-CONTRIBUTION-GUIDE/images/deploytoazure.png"/>
 </a>
 
+If you need an azure account you can get a free one [here](https://azure.microsoft.com/en-us/offers/ms-azr-0044p/?WT.mc_id=medium-blog-abornst)
+
 ## Docker Service 
 ```
 docker run --rm -it  -p 5000:5000  -e 'region=westeurope' -e 'key=put azure cv key here' abornst/homoglyph_service
