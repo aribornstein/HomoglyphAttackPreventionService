@@ -11,7 +11,7 @@ To use the service just send a URL encoded query string of up to 200 characters 
 <img src="https://raw.githubusercontent.com/Azure/azure-quickstart-templates/master/1-CONTRIBUTION-GUIDE/images/deploytoazure.png"/>
 </a>
 
-If you need an azure account you can get a free one [here](https://azure.microsoft.com/en-us/offers/ms-azr-0044p/?WT.mc_id=medium-blog-abornst)
+If you need an azure account you can get a free one [here](https://azure.microsoft.com/en-us/offers/ms-azr-0044p/?WT.mc_id=github-repo-abornst)
 
 ## Docker Service 
 ```
